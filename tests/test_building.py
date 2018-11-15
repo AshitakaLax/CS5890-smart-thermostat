@@ -1,9 +1,7 @@
 from datetime import timedelta
 
 import pytest
-
-from simplesimple import Building
-
+from models import Building
 
 @pytest.fixture
 def building():
