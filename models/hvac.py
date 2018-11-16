@@ -36,11 +36,14 @@ class HVAC():
 		self.__flame_ignitor_duration = flameIgnitorDuration
 		self.__gas_valve_open_delay = gasValveOpenDelay
 		self.__house_blower_on_delay = houseBlowerOnDelay
+		self.__HeatingShutoffDuration = 0
 		self.TotalPowerUsed = 0.0
-		self.TotalGasUsed = 0.0
+		self.TotalPowerHeatingUsed = 0.0
+		self.TotalPowerCoolingUsed = 0.0
 		self.TotalDurationHeatingOn = 0.0
 		self.TotalDurationCoolingOn = 0.0
 		self.CoolingIsOn = False
+		self.HeatingIsShuttingDown = False
 		self.HeatingIsOn = False
 		self.LastCoolingDuration = 0
 		self.LastHeatingDuration = 0
@@ -57,23 +60,88 @@ class HVAC():
 		self.TotalDurationCoolingOn = self.TotalDurationCoolingOn + self.LastCoolingDuration
 
 	def TurnHeatingOn(self):
+		# check whether we can turn the heating on
+		if self.HeatingIsShuttingDown:
+			return
+
+		# Can't turn on the Heater when the Cooling is already on
 		if self.CoolingIsOn:
 			return
-			
+		
 		self.LastHeatingDuration = 0
+		self.__HeatingShutoffDuration = 0
 		self.HeatingIsOn = True
 		
-	def TurnHeatingingOff(self):
-		self.HeatingIsOn = False
-		self.TotalDurationHeatingOn = self.TotalDurationHeatingOn + self.LastHeatingDuration
+	def TurnHeatingOff(self):
+		# check whether we are just starting to turn off the heater
+		if self.HeatingIsOn and not self.HeatingIsShuttingDown:
+			self.HeatingIsShuttingDown = True
+
+		# the simulation will manage when the funace is completely shutoff
+		#self.HeatingIsOn = False
+		#self.TotalDurationHeatingOn = self.TotalDurationHeatingOn + self.LastHeatingDuration
+		# Update the the state of the Heating since the heater can't shutdown for a while longer
+
+
 
 	def SimulateOneSecond(self):
 		"""Runs the model for 1 second to determine the total energy used
 		"""
-
+		energyConsumedSum = 0.0
 		if self.CoolingIsOn == False and self.HeatingIsOn == False:
 			return
-		# check whether the 
+		# check whether the Heating is on
+		if self.HeatingIsOn:
+			# how long has heating been on
+			energyConsumedSum = self.__SumHeating__()
+			self.TotalPowerHeatingUsed = self.TotalPowerHeatingUsed + energyConsumedSum
+
+			# Increment the Heater duration 
+			self.LastHeatingDuration = self.LastHeatingDuration + 1
+			if self.HeatingIsShuttingDown:
+				# determine how long the till it is completely shutoff
+				self.__HeatingShutoffDuration = self.__HeatingShutoffDuration + 1
+
+
+		else:
+			# how long has Cooling been on
+			energyConsumedSum = self.__SumCooling__()
+			self.TotalDurationCoolingOn = self.TotalDurationCoolingOn + energyConsumedSum
+
+		self.TotalPowerUsed = self.TotalPowerUsed + energyConsumedSum
+
+	def __SumHeating__(self):
+		"""Sums the heating portions of the HVAC
+		"""
+		heatingSum = 0.0
+		# determine which phase the heating is in
+
+		# check whetheer it is shutting down, this is a first check in case they decide to shutdown in the middle of the startup
+		if self.HeatingIsShuttingDown:
+			if self.__HeatingShutoffDuration < -(self.__gas_vent_shut_off_delta.total_seconds) :
+
+			if self.__HeatingShutoffDuration < -(self.__gas_valve_shut_off_delta.total_seconds) :
+				heatingSum = heatingSum + self.__Ga
+
+		# check if it is just starting up
+		if self.LastHeatingDuration < self.__flame_ignitor_duration.total_seconds:
+
+
+
+		return 0.0
+
+
+	def __SumCooling__(self):
+		"""Sums the cooling portions of the HVAC for the last second
+		"""
+		# check if Cooling is on
+		if not self.CoolingIsOn: 
+			return 0.0
+		
+		# The blower and compressor are running
+		acSum = self.__air_conditioning_energy + self.__house_blower_energy
+		return acSum
+
 
 		
 
