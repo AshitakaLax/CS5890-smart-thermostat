@@ -102,7 +102,6 @@ class HVAC():
 				# determine how long the till it is completely shutoff
 				self.__HeatingShutoffDuration = self.__HeatingShutoffDuration + 1
 
-
 		else:
 			# how long has Cooling been on
 			energyConsumedSum = self.__SumCooling__()
@@ -119,16 +118,29 @@ class HVAC():
 		# check whetheer it is shutting down, this is a first check in case they decide to shutdown in the middle of the startup
 		if self.HeatingIsShuttingDown:
 			if self.__HeatingShutoffDuration < -(self.__gas_vent_shut_off_delta.total_seconds) :
-
+				heatingSum = heatingSum + self.__gas_vent_blower_energy
 			if self.__HeatingShutoffDuration < -(self.__gas_valve_shut_off_delta.total_seconds) :
-				heatingSum = heatingSum + self.__Ga
+				heatingSum = heatingSum + self.__house_blower_energy
+			else:
+				# we have finished the shut off cycle
+				self.HeatingIsOn = False
+				self.HeatingIsShuttingDown = False
+				self.TotalDurationHeatingOn = self.TotalDurationHeatingOn + self.LastHeatingDuration
 
-		# check if it is just starting up
-		if self.LastHeatingDuration < self.__flame_ignitor_duration.total_seconds:
-
-
-
-		return 0.0
+		# heater is starting up
+		elif self.LastHeatingDuration < self.__house_blower_on_delay.total_seconds:
+			# Pre gas turns on
+			if self.LastHeatingDuration < self.__flame_ignitor_duration.total_seconds:
+				heatingSum = heatingSum + self.__gas_vent_blower_energy + self.__flame_ignitor_energy
+			else:
+				# after the gas turns on, but the blower hasn't turned on yet
+				heatingSum = heatingSum + self.__gas_valve_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
+		else:
+			# the system is in mid run with the gas vent running, gas energy, gas valve is on, and house blower
+			heatingSum = heatingSum + self.__gas_valve_energy + self.__house_blower_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
+			# check if it is just starting up
+			
+		return heatingSum
 
 
 	def __SumCooling__(self):
