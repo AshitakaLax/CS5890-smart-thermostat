@@ -43,5 +43,38 @@ def test_HVAC_Pass_ignite(typicalHvac):
 	totalPowerUsed = typicalHvac.TotalPowerUsed
 	assert typicalHvac.HeatingIsOn == True
 	assert typicalHvac.LastHeatingDuration == 31
-	assert totalPowerUsed == startupEnergy + 
+
+	# gas energy + startup energy + vent blower engery + gas valve energy
+	assert totalPowerUsed == startupEnergy + 12 + 29307 + 184
+
+
+def test_HVAC_cooling_on(typicalHvac: HVAC):
+	"""Tests the typical power when the cooling is on
+	
+	Arguments:
+		typicalHvac {HVAC} -- the hvac test fixture object
+	"""
+	typicalHvac.TurnCoolingOn()
+	typicalHvac.SimulateOneSecond()
+	assert typicalHvac.CoolingIsOn == True
+	assert typicalHvac.TotalPowerUsed == (3740 + 587)
+	assert typicalHvac.LastCoolingDuration == 1
+
+	
+def test_HVAC_cooling_on_off(typicalHvac: HVAC):
+	"""Tests the typical power when the cooling is on and then switched to off
+	
+	Arguments:
+		typicalHvac {HVAC} -- the hvac test fixture object
+	"""
+	typicalHvac.TurnCoolingOn()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.TurnCoolingOff()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+
+	assert typicalHvac.CoolingIsOn == False
+	assert typicalHvac.TotalPowerUsed == (3740 + 587)
+	assert typicalHvac.LastCoolingDuration == 1
 

@@ -58,7 +58,6 @@ class HVAC():
 
 	def TurnCoolingOff(self):
 		self.CoolingIsOn = False
-		self.TotalDurationCoolingOn = self.TotalDurationCoolingOn + self.LastCoolingDuration
 
 	def TurnHeatingOn(self):
 		# check whether we can turn the heating on
@@ -106,7 +105,9 @@ class HVAC():
 		else:
 			# how long has Cooling been on
 			energyConsumedSum = self.__SumCooling__()
-			self.TotalDurationCoolingOn = self.TotalDurationCoolingOn + energyConsumedSum
+			self.TotalPowerCoolingUsed = self.TotalPowerCoolingUsed + energyConsumedSum
+			self.TotalDurationCoolingOn = self.TotalDurationCoolingOn + 1
+			self.LastCoolingDuration = self.LastCoolingDuration + 1
 
 		self.TotalPowerUsed = self.TotalPowerUsed + energyConsumedSum
 
