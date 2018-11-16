@@ -1,19 +1,19 @@
 from datetime import timedelta
-import building
+#import building
 
 class HVAC():
 	"""Simulates an HVAC system with the startup times 
 	and all of the of the cycles that a normal furnace has
 
 	"""
-	def init(self, gasValveEnergy=12, gasVentBlowerEnergy=184, 
+	def __init__(self, gasValveEnergy=12, gasVentBlowerEnergy=184, 
 	gasRateEnergy=29307, flameIgnitorEnergy=460, 
 	houseBlowerEnergy=587, airConditioningEnergy= 3740,
-	gasVentShutOffDelta=timedelta(-120),
-	gasValveShutOffDelta=timedelta(-150),
-	flameIgnitorDuration=timedelta(30),
-	gasValveOpenDelay=timedelta(30),
-	houseBlowerOnDelay=timedelta(70)):
+	gasVentShutOffDelta=timedelta(seconds = -120),
+	gasValveShutOffDelta=timedelta(seconds = -150),
+	flameIgnitorDuration=timedelta(seconds = 30),
+	gasValveOpenDelay=timedelta(seconds = 30),
+	houseBlowerOnDelay=timedelta(seconds = 70)):
 		"""The HVAC object initializer
 		
 		Keyword Arguments:
@@ -23,6 +23,7 @@ class HVAC():
 			flameIgnitorEnergy {int} -- The ceramic flame ignitor to start the gas (default: {460 Watts})
 			houseBlowerEnergy {int} -- The HVAC blower to circulate the air through the house, taking air in from the cool air return. default blower is a 1/3 HP motor (default: {587 Watts})
 			airConditioningEnergy {int} -- The amount of energy the air conditioner compressor uses which provites 42,000 BTUs (default: {3740 Watts})
+			gasVentShutOffDelta {timedelta} -- the time for the gas vent to shutoff (default: {3740 Watts})
 		"""
 
 		self.__gas_valve_energy = gasValveEnergy
@@ -117,9 +118,9 @@ class HVAC():
 
 		# check whetheer it is shutting down, this is a first check in case they decide to shutdown in the middle of the startup
 		if self.HeatingIsShuttingDown:
-			if self.__HeatingShutoffDuration < -(self.__gas_vent_shut_off_delta.total_seconds) :
+			if self.__HeatingShutoffDuration < (-1 * self.__gas_vent_shut_off_delta.total_seconds()) :
 				heatingSum = heatingSum + self.__gas_vent_blower_energy
-			if self.__HeatingShutoffDuration < -(self.__gas_valve_shut_off_delta.total_seconds) :
+			if self.__HeatingShutoffDuration < (-1 * self.__gas_valve_shut_off_delta.total_seconds()) :
 				heatingSum = heatingSum + self.__house_blower_energy
 			else:
 				# we have finished the shut off cycle
@@ -128,9 +129,9 @@ class HVAC():
 				self.TotalDurationHeatingOn = self.TotalDurationHeatingOn + self.LastHeatingDuration
 
 		# heater is starting up
-		elif self.LastHeatingDuration < self.__house_blower_on_delay.total_seconds:
+		elif self.LastHeatingDuration < self.__house_blower_on_delay.total_seconds():
 			# Pre gas turns on
-			if self.LastHeatingDuration < self.__flame_ignitor_duration.total_seconds:
+			if self.LastHeatingDuration < self.__flame_ignitor_duration.total_seconds():
 				heatingSum = heatingSum + self.__gas_vent_blower_energy + self.__flame_ignitor_energy
 			else:
 				# after the gas turns on, but the blower hasn't turned on yet
