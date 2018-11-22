@@ -48,6 +48,8 @@ class HVAC():
 		self.HeatingIsOn = False
 		self.LastCoolingDuration = 0
 		self.LastHeatingDuration = 0
+		self.__lastCoolingEnergyInputed = 0
+		self.__lastHeatingEnergyInputed = 0
 		
 	def TurnCoolingOn(self):
 		if self.HeatingIsOn:
@@ -82,12 +84,32 @@ class HVAC():
 		#self.TotalDurationHeatingOn = self.TotalDurationHeatingOn + self.LastHeatingDuration
 		# Update the the state of the Heating since the heater can't shutdown for a while longer
 
-
+	def GetMaxHeatingPower(self):
+		"""Gets the Max Heating available for the furnace
+		"""
+		return self.__gas_rate_energy
+	
+	def GetLastIntervalHeatingPower(self):
+		"""Gets the amount of heating power that was inputed to actually heating the house
+		"""
+		return self.__lastHeatingEnergyInputed
+	
+	def GetMaxCoolingPower(self):
+		"""Get the max amount of cooling available from the A/C
+		"""
+		return self.__air_conditioning_energy
+	
+	def GetLastIntervalCoolingPower(self):
+		"""Gets the amount of power that was inputed to actually cooling the house
+		"""
+		return self.__lastCoolingEnergyInputed
 
 	def SimulateOneSecond(self):
 		"""Runs the model for 1 second to determine the total energy used
 		"""
 		energyConsumedSum = 0.0
+		self.__lastCoolingEnergyInputed = 0.0
+		self.__lastHeatingEnergyInputed = 0.0
 		if self.CoolingIsOn == False and self.HeatingIsOn == False:
 			return
 		# check whether the Heating is on
@@ -110,6 +132,7 @@ class HVAC():
 			self.LastCoolingDuration = self.LastCoolingDuration + 1
 
 		self.TotalPowerUsed = self.TotalPowerUsed + energyConsumedSum
+		return energyConsumedSum
 
 	def __SumHeating__(self):
 		"""Sums the heating portions of the HVAC
@@ -117,8 +140,9 @@ class HVAC():
 		heatingSum = 0.0
 		# determine which phase the heating is in
 
-		# check whetheer it is shutting down, this is a first check in case they decide to shutdown in the middle of the startup
+		# check whether it is shutting down, this is a first check in case they decide to shutdown in the middle of the startup
 		if self.HeatingIsShuttingDown:
+			self.__lastHeatingEnergyInputed = self.__determine_shutdown_heat_energy()
 			if self.__HeatingShutoffDuration < (-1 * self.__gas_vent_shut_off_delta.total_seconds()) :
 				heatingSum = heatingSum + self.__gas_vent_blower_energy
 			if self.__HeatingShutoffDuration < (-1 * self.__gas_valve_shut_off_delta.total_seconds()) :
@@ -136,11 +160,12 @@ class HVAC():
 				heatingSum = heatingSum + self.__gas_vent_blower_energy + self.__flame_ignitor_energy
 			else:
 				# after the gas turns on, but the blower hasn't turned on yet
+				self.__lastHeatingEnergyInputed = self.__gas_rate_energy
 				heatingSum = heatingSum + self.__gas_valve_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
 		else:
 			# the system is in mid run with the gas vent running, gas energy, gas valve is on, and house blower
+			self.__lastHeatingEnergyInputed = self.__gas_rate_energy # calculation for the amount of heat input to the house
 			heatingSum = heatingSum + self.__gas_valve_energy + self.__house_blower_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
-			# check if it is just starting up
 			
 		return heatingSum
 
@@ -149,13 +174,25 @@ class HVAC():
 		"""Sums the cooling portions of the HVAC for the last second
 		"""
 		# check if Cooling is on
-		if not self.CoolingIsOn: 
+		if not self.CoolingIsOn:
 			return 0.0
 		
 		# The blower and compressor are running
+		self.__lastCoolingEnergyInputed = self.__air_conditioning_energy
 		acSum = self.__air_conditioning_energy + self.__house_blower_energy
 		return acSum
 
+	def __determine_shutdown_heat_energy(self):
+		"""Used to calculate the amount of energy that is still left in the heat register that could be added to the house
+		"""
+		totalShutdownTime = -1 * self.__gas_valve_shut_off_delta.total_seconds()
+		timeRemaining = totalShutdownTime - self.__HeatingShutoffDuration
+		if timeRemaining <= 0:
+			return 0.0
+		
+		# caculate the percentage of in the shutdown time
+		gasHeatPercentage = timeRemaining / totalShutdownTime
+		return gasHeatPercentage * self.__gas_rate_energy
 
 		
 
