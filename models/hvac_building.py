@@ -1,8 +1,6 @@
 from datetime import timedelta
-from hvac import HVAC
+from  .hvac import HVAC
 #import building
-
-
 class HvacBuilding():
 	"""A simple Hvac Building Energy Model.
 
@@ -24,6 +22,7 @@ class HvacBuilding():
 	def __init__(self, hvac: HVAC, manual_control: bool, heat_mass_capacity, heat_transmission,
 			initial_building_temperature, time_step_size,
 			conditioned_floor_area):
+
 		self.building_hvac = hvac
 		self.__manual_control = manual_control
 		self.__heat_mass_capacity = heat_mass_capacity
@@ -63,9 +62,15 @@ class HvacBuilding():
 		# check whether we should use manual control
 		if (self.__manual_control):
 			# check whether the heater of Cooling is on
-			self.building_hvac.
-				next_temperature_heating_cooling = next_temperature(power)
-				self.current_temperature = next_temperature_heating_cooling
+			btu_power = 0.0
+			if self.building_hvac.HeatingIsOn:
+				btu_power = self.building_hvac.GetLastIntervalHeatingPower()
+
+			elif self.building_hvac.CoolingIsOn:
+				btu_power = self.building_hvac.GetLastIntervalCoolingPower()
+			
+			next_temperature_heating_cooling = next_temperature(btu_power)
+			self.current_temperature = next_temperature_heating_cooling
 
 		else:
 			# Get the next temperature if there was no power input into the system
