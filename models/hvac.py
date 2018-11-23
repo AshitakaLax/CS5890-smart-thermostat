@@ -39,6 +39,7 @@ class HVAC():
 		self.__house_blower_on_delay = houseBlowerOnDelay
 		self.__HeatingShutoffDuration = 0
 		self.TotalPowerUsed = 0.0
+		self.TotalTimeInSeconds = 0
 		self.TotalPowerHeatingUsed = 0.0
 		self.TotalPowerCoolingUsed = 0.0
 		self.TotalDurationHeatingOn = 0.0
@@ -103,11 +104,17 @@ class HVAC():
 		"""Gets the amount of power that was inputed to actually cooling the house
 		"""
 		return self.__lastCoolingEnergyInputed
+	
+	def GetAverageWattsPerSecond(self):
+		"""Gets the amount of power that was inputed to actually cooling the house
+		"""
+		return self.TotalPowerUsed / self.TotalTimeInSeconds
 
 	def SimulateOneSecond(self):
 		"""Runs the model for 1 second to determine the total energy used
 		"""
 		energyConsumedSum = 0.0
+		self.TotalTimeInSeconds = self.TotalTimeInSeconds + 1
 		self.__lastCoolingEnergyInputed = 0.0
 		self.__lastHeatingEnergyInputed = 0.0
 		if self.CoolingIsOn == False and self.HeatingIsOn == False:
@@ -193,6 +200,7 @@ class HVAC():
 		# caculate the percentage of in the shutdown time
 		gasHeatPercentage = timeRemaining / totalShutdownTime
 		return gasHeatPercentage * self.__gas_rate_energy
+
 
 		
 

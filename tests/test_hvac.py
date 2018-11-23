@@ -60,7 +60,6 @@ def test_HVAC_cooling_on(typicalHvac: HVAC):
 	assert typicalHvac.TotalPowerUsed == (3740 + 587)
 	assert typicalHvac.LastCoolingDuration == 1
 
-	
 def test_HVAC_cooling_on_off(typicalHvac: HVAC):
 	"""Tests the typical power when the cooling is on and then switched to off
 	
@@ -77,4 +76,24 @@ def test_HVAC_cooling_on_off(typicalHvac: HVAC):
 	assert typicalHvac.CoolingIsOn == False
 	assert typicalHvac.TotalPowerUsed == (3740 + 587)
 	assert typicalHvac.LastCoolingDuration == 1
+	
+def test_HVAC_Average_watts(typicalHvac: HVAC):
+	"""Tests the The average watts per second calculation
+	
+	Arguments:
+		typicalHvac {HVAC} -- the hvac test fixture object
+	"""
+	typicalHvac.TurnCoolingOn()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.TurnCoolingOff()
+
+	assert typicalHvac.TotalPowerUsed == (3740 + 587)
+	assert typicalHvac.LastCoolingDuration == 1
+	assert typicalHvac.GetAverageWattsPerSecond() == (3740 + 587)
+	typicalHvac.TurnCoolingOff()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+
+	assert typicalHvac.GetAverageWattsPerSecond() == ((3740 + 587) / 4)
 
