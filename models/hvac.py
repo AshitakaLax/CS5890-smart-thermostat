@@ -6,9 +6,13 @@ class HVAC():
 	and all of the of the cycles that a normal furnace has
 
 	"""
-	def __init__(self, gasValveEnergy=12, gasVentBlowerEnergy=184, 
-	gasRateEnergy=29307, flameIgnitorEnergy=460, 
-	houseBlowerEnergy=587, airConditioningEnergy= 3740,
+	def __init__(self, 
+	gasValveEnergy=12, 
+	gasVentBlowerEnergy=184, 
+	gasRateEnergy=29307, 
+	flameIgnitorEnergy=460, 
+	houseBlowerEnergy=587, 
+	airConditioningEnergy= 3740,
 	gasVentShutOffDelta=timedelta(seconds = -120),
 	gasValveShutOffDelta=timedelta(seconds = -150),
 	flameIgnitorDuration=timedelta(seconds = 30),
@@ -23,9 +27,13 @@ class HVAC():
 			flameIgnitorEnergy {int} -- The ceramic flame ignitor to start the gas (default: {460 Watts})
 			houseBlowerEnergy {int} -- The HVAC blower to circulate the air through the house, taking air in from the cool air return. default blower is a 1/3 HP motor (default: {587 Watts})
 			airConditioningEnergy {int} -- The amount of energy the air conditioner compressor uses which provites 42,000 BTUs (default: {3740 Watts})
-			gasVentShutOffDelta {timedelta} -- the time for the gas vent to shutoff (default: {3740 Watts})
+			gasVentShutOffDelta {timedelta} -- the negative time for the gas vent shuts off befor the heater is off(default: {-120 seconds})
+			gasValveShutOffDelta {timedelta} -- the negative time for the gas Valve shuts off befor the heater is off (default: {-150 seconds})
+			flameIgnitorDuration {timedelta} -- the time from the beginning of the heater being on that power is applied to the flame starter (default: {30 seconds})
+			gasValveOpenDelay {timedelta} -- the time from the beginning of the heater being on before the gas is turned on (default: {30 seconds})
+			houseBlowerOnDelay {timedelta} -- the time from the beginning of the heater being on before the blower turns on (default: {70 seconds})
 		"""
-
+		# parameter variables
 		self.__gas_valve_energy = gasValveEnergy
 		self.__gas_vent_blower_energy = gasVentBlowerEnergy
 		self.__gas_rate_energy = gasRateEnergy
@@ -37,22 +45,29 @@ class HVAC():
 		self.__flame_ignitor_duration = flameIgnitorDuration
 		self.__gas_valve_open_delay = gasValveOpenDelay
 		self.__house_blower_on_delay = houseBlowerOnDelay
-		self.__HeatingShutoffDuration = 0
-		self.TotalPowerUsed = 0.0
-		self.TotalTimeInSeconds = 0
-		self.TotalPowerHeatingUsed = 0.0
-		self.TotalPowerCoolingUsed = 0.0
-		self.TotalDurationHeatingOn = 0.0
-		self.TotalDurationCoolingOn = 0.0
-		self.CoolingIsOn = False
-		self.HeatingIsShuttingDown = False
-		self.HeatingIsOn = False
-		self.LastCoolingDuration = 0
-		self.LastHeatingDuration = 0
-		self.__lastCoolingEnergyInputed = 0
-		self.__lastHeatingEnergyInputed = 0
+
+		# Initialize Public Variables
+		self.TotalPowerUsed = 0.0 # The total number of watts used
+		self.TotalTimeInSeconds = 0 # The total amount of time the furnace has run for
+		self.TotalPowerHeatingUsed = 0.0 # The Total amount of Power Heating has been used (includes gas heating energy and overhead energy)
+		self.TotalPowerCoolingUsed = 0.0 # The Total amount of Power Cooling has been used (includes cooling energy and overhead energy)
+		self.TotalDurationHeatingOn = 0.0 # The total amount of time the heating has been used (including starting and shutdown usage)
+		self.TotalDurationCoolingOn = 0.0 # The total amount of time the cooling has been used
+		self.CoolingIsOn = False # whether the Cooling is on or off
+		self.HeatingIsShuttingDown = False # whether the Heating is in the shutting down phase
+		self.HeatingIsOn = False # Whether the Heater is on or off (This is true when the heating is shutting down)
+		self.LastCoolingDuration = 0 # The last length of time of the last cooling duration
+		self.LastHeatingDuration = 0 # the last length of time of the last heating duration (this includes the starting and shutdown usage)
+
+		# initialize Private Variables
+		self.__HeatingShutoffDuration = 0 # Used to keep track of how long we have been shutting down the heater
+		self.__lastCoolingEnergyInputed = 0 # Used to keep track of the last amount of just cooling energy that was inputed into the house
+		self.__lastHeatingEnergyInputed = 0 # Used to keep track of the last amount of just heating energy that was inputed into the house (this is 0 during heating start up)
+
 		
 	def TurnCoolingOn(self):
+		"""Turns the A/C on.
+		"""
 		if self.HeatingIsOn:
 			return
 
@@ -60,9 +75,13 @@ class HVAC():
 		self.CoolingIsOn = True
 
 	def TurnCoolingOff(self):
+		"""Turns the A/C off.
+		"""
 		self.CoolingIsOn = False
 
 	def TurnHeatingOn(self):
+		"""Turns the Heater on by starting the initial furnace sequence.
+		"""
 		# check whether we can turn the heating on
 		if self.HeatingIsShuttingDown:
 			return
@@ -76,6 +95,9 @@ class HVAC():
 		self.HeatingIsOn = True
 		
 	def TurnHeatingOff(self):
+		"""Turns the Heater off by starting the shutdown sequence.
+		"""
+
 		# check whether we are just starting to turn off the heater
 		if self.HeatingIsOn and not self.HeatingIsShuttingDown:
 			self.HeatingIsShuttingDown = True
@@ -142,7 +164,7 @@ class HVAC():
 		return energyConsumedSum
 
 	def __SumHeating__(self):
-		"""Sums the heating portions of the HVAC
+		"""Sums the heating portions of the HVAC for one second, and keeps track of the stage of the heating (starting, running, and cooling)
 		"""
 		heatingSum = 0.0
 		# determine which phase the heating is in
