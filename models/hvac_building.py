@@ -77,6 +77,9 @@ class HvacBuilding():
 		if self.__hvac_building_tracker != None:
 			self.__hvac_building_tracker.AddSample(next_temperature_heating_cooling, outside_temperature, self.building_hvac.GetAverageWattsPerSecond())
 
+	def GetHvacBuildingTracker(self):
+		return self.__hvac_building_tracker
+		
 	def _next_temperature(self, outside_temperature, heating_cooling_power):
 		dt_by_cm = self.__time_step_size.total_seconds() / self.__heat_mass_capacity
 		return (self.current_temperature * (1 - dt_by_cm * self.__heat_transmission) + dt_by_cm * (heating_cooling_power + self.__heat_transmission * outside_temperature))
