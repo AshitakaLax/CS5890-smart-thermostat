@@ -3,23 +3,7 @@ from datetime import timedelta
 
 class HVAC():
 	"""Simulates an HVAC system with the startup times 
-	and all of the of the cycles that a normal furnace has
-
-	"""
-	def __init__(self, 
-	gasValveEnergy=12, 
-	gasVentBlowerEnergy=184, 
-	gasRateEnergy=29307, 
-	flameIgnitorEnergy=460, 
-	houseBlowerEnergy=587, 
-	airConditioningEnergy= 3740,
-	gasVentShutOffDelta=timedelta(seconds = -120),
-	gasValveShutOffDelta=timedelta(seconds = -150),
-	flameIgnitorDuration=timedelta(seconds = 30),
-	gasValveOpenDelay=timedelta(seconds = 30),
-	houseBlowerOnDelay=timedelta(seconds = 70)):
-		"""The HVAC object initializer
-		
+	and all of the of the cycles that a normal furnace has		
 		Keyword Arguments:
 			gasValveEnergy {int} -- The amount of energy used by the gas value solenoid valve (default: {12 Watts})
 			gasVentBlowerEnergy {int} -- The vent for the used gas out of the top of the heat exchange (default: {184 Watts})
@@ -33,6 +17,20 @@ class HVAC():
 			gasValveOpenDelay {timedelta} -- the time from the beginning of the heater being on before the gas is turned on (default: {30 seconds})
 			houseBlowerOnDelay {timedelta} -- the time from the beginning of the heater being on before the blower turns on (default: {70 seconds})
 		"""
+
+
+	def __init__(self, 
+	gasValveEnergy=12, 
+	gasVentBlowerEnergy=184, 
+	gasRateEnergy=29307, 
+	flameIgnitorEnergy=460, 
+	houseBlowerEnergy=587, 
+	airConditioningEnergy= 3740,
+	gasVentShutOffDelta=timedelta(seconds = -120),
+	gasValveShutOffDelta=timedelta(seconds = -150),
+	flameIgnitorDuration=timedelta(seconds = 30),
+	gasValveOpenDelay=timedelta(seconds = 30),
+	houseBlowerOnDelay=timedelta(seconds = 70)):
 		# parameter variables
 		self.__gas_valve_energy = gasValveEnergy
 		self.__gas_vent_blower_energy = gasVentBlowerEnergy

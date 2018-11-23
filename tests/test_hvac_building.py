@@ -10,7 +10,6 @@ def hvacBuilding():
     conditioned_floor_area = 100
     return HvacBuilding(
 		HVAC(), 
-		True,
         heat_mass_capacity=16500 * conditioned_floor_area,
         #heat_mass_capacity=165000 * conditioned_floor_area,
         heat_transmission=500,
