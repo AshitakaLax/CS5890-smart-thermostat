@@ -14,7 +14,6 @@ def hvacBuilding():
         #heat_mass_capacity=165000 * conditioned_floor_area,
         heat_transmission=500,
         initial_building_temperature=22,
-        time_step_size=timedelta(seconds=1),
         conditioned_floor_area=conditioned_floor_area)
 
 def test_HVAC_off(hvacBuilding: HvacBuilding):
@@ -26,7 +25,7 @@ def test_HVAC_off(hvacBuilding: HvacBuilding):
 	# check that the temperature is getting cooler every time
 	currentBuildingTemperature = 22
 	for i in range(10):
-		hvacBuilding.step(0, 30, 25)
+		hvacBuilding.step(0)
 		assert hvacBuilding.current_temperature < currentBuildingTemperature
 		currentBuildingTemperature = hvacBuilding.current_temperature
 		
@@ -43,8 +42,7 @@ def test_HVAC_on(hvacBuilding: HvacBuilding):
 	hvacBuilding.building_hvac.TurnHeatingOn()
 
 	for i in range(60):
-		hvacBuilding.step(55, 0, 0)
-		hvacBuilding.building_hvac.SimulateOneSecond()
+		hvacBuilding.step(55)
 		assert hvacBuilding.current_temperature > currentBuildingTemperature
 		currentBuildingTemperature = hvacBuilding.current_temperature
 	

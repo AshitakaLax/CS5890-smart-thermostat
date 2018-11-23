@@ -1,4 +1,5 @@
 from datetime import timedelta
+from util import HvacTracker
 #import building
 
 class HVAC():
@@ -17,8 +18,6 @@ class HVAC():
 			gasValveOpenDelay {timedelta} -- the time from the beginning of the heater being on before the gas is turned on (default: {30 seconds})
 			houseBlowerOnDelay {timedelta} -- the time from the beginning of the heater being on before the blower turns on (default: {70 seconds})
 		"""
-
-
 	def __init__(self, 
 	gasValveEnergy=12, 
 	gasVentBlowerEnergy=184, 
