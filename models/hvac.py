@@ -54,6 +54,7 @@ class HVAC():
 		self.HeatingIsOn = False # Whether the Heater is on or off (This is true when the heating is shutting down)
 		self.LastCoolingDuration = 0 # The last length of time of the last cooling duration
 		self.LastHeatingDuration = 0 # the last length of time of the last heating duration (this includes the starting and shutdown usage)
+		self.TotalGasEnergyUsed = 0.0 # The total amount of gas energy
 
 		# initialize Private Variables
 		self.__HeatingShutoffDuration = 0 # Used to keep track of how long we have been shutting down the heater
@@ -78,6 +79,10 @@ class HVAC():
 	def TurnHeatingOn(self):
 		"""Turns the Heater on by starting the initial furnace sequence.
 		"""
+		# if heater is on, we can't turn it on again
+		if self.HeatingIsOn:
+			return
+
 		# check whether we can turn the heating on
 		if self.HeatingIsShuttingDown:
 			return
@@ -127,6 +132,11 @@ class HVAC():
 		"""Gets the amount of power that was inputed to actually cooling the house
 		"""
 		return self.TotalPowerUsed / self.TotalTimeInSeconds
+
+	def GetTotalGasEnergyUsed(self):
+		"""Gets the total Amount of Gas energy used
+		"""
+		return self.TotalGasEnergyUsed
 
 	def SimulateOneSecond(self):
 		"""Runs the model for 1 second to determine the total energy used
@@ -186,10 +196,12 @@ class HVAC():
 			else:
 				# after the gas turns on, but the blower hasn't turned on yet
 				self.__lastHeatingEnergyInputed = self.__gas_rate_energy
+				self.TotalGasEnergyUsed = self.TotalGasEnergyUsed + self.__gas_rate_energy
 				heatingSum = heatingSum + self.__gas_valve_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
 		else:
 			# the system is in mid run with the gas vent running, gas energy, gas valve is on, and house blower
 			self.__lastHeatingEnergyInputed = self.__gas_rate_energy # calculation for the amount of heat input to the house
+			self.TotalGasEnergyUsed = self.TotalGasEnergyUsed + self.__gas_rate_energy
 			heatingSum = heatingSum + self.__gas_valve_energy + self.__house_blower_energy + self.__gas_rate_energy + self.__gas_vent_blower_energy
 			
 		return heatingSum
