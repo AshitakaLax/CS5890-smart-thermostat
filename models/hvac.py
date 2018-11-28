@@ -55,6 +55,8 @@ class HVAC():
 		self.LastCoolingDuration = 0 # The last length of time of the last cooling duration
 		self.LastHeatingDuration = 0 # the last length of time of the last heating duration (this includes the starting and shutdown usage)
 		self.TotalGasEnergyUsed = 0.0 # The total amount of gas energy
+		self.NumberOfTimesHeatingTurnedOn = 0
+		self.NumberOfTimesCoolingTurnedOn = 0
 
 		# initialize Private Variables
 		self.__HeatingShutoffDuration = 0 # Used to keep track of how long we have been shutting down the heater
@@ -67,7 +69,8 @@ class HVAC():
 		"""
 		if self.HeatingIsOn:
 			return
-
+		
+		self.NumberOfTimesCoolingTurnedOn = self.NumberOfTimesCoolingTurnedOn + 1
 		self.LastCoolingDuration = 0
 		self.CoolingIsOn = True
 
@@ -91,6 +94,7 @@ class HVAC():
 		if self.CoolingIsOn:
 			return
 		
+		self.NumberOfTimesHeatingTurnedOn = self.NumberOfTimesHeatingTurnedOn + 1
 		self.LastHeatingDuration = 0
 		self.__HeatingShutoffDuration = 0
 		self.HeatingIsOn = True

@@ -13,7 +13,7 @@ tracker = HvacBuildingTracker()
 conditioned_floor_area = 100
 hvacBuilding = HvacBuilding(
 	hvac, 
-    heat_mass_capacity=165000 * conditioned_floor_area,
+    heat_mass_capacity=16500 * conditioned_floor_area,
     heat_transmission=200,
     initial_building_temperature=18,
     conditioned_floor_area=conditioned_floor_area,
@@ -33,34 +33,13 @@ for outsideTemperature in loganOutsideTemperatures:
 	# iterate through one hour with the same temperature
 	for	i in range(3600):
 		hvacBuilding.step(outsideTemperature)
-		if not hvac.HeatingIsShuttingDown and hvac.HeatingIsOn and hvacBuilding.current_temperature > 21:
+		if not hvac.HeatingIsShuttingDown and hvac.HeatingIsOn and hvacBuilding.current_temperature > 18.8889:#21:
 			print("Turning the Heater Off")
 			hvac.TurnHeatingOff()
 
-		if hvac.HeatingIsOn == False and hvacBuilding.current_temperature < 17:
+		if hvac.HeatingIsOn == False and hvacBuilding.current_temperature < 17.7778:#17:
 			print("Turning the Heater On")
 			numberOfHeatingOn = numberOfHeatingOn + 1
 			hvac.TurnHeatingOn()
-print()
-print("     RESULTS    ")
-print()
-print("The Number of times the furnace turns on: " + str(numberOfHeatingOn))
-print("The Current Temperature: " + str(hvacBuilding.current_temperature) + "C")
-print("The total power used: " + str(hvac.TotalPowerUsed) + "Watts")
-print("The total power used: " + str(hvac.TotalPowerUsed / 1000) + "KWatts")
-print("The total Time furnace is on: " + str(hvac.TotalTimeInSeconds))
-wattsPerSecond = hvac.GetAverageWattsPerSecond()
-print("The Average Watts Per Second: " + str(wattsPerSecond))
 
-# convert to Kilowatts per second
-KilowattHour = wattsPerSecond /1000
-# convert to kilowatts per hour
-KilowattHour = KilowattHour * 3600
-print("The Average KWH: " + str(KilowattHour))
-totalEnergy = hvac.TotalPowerUsed
-totalGasEnergyUsed = hvac.GetTotalGasEnergyUsed()
-
-print("The Total Electrical Only Energy Used: " + str(totalEnergy - totalGasEnergyUsed))
-print("The Total Gas Energy Used: " + str(totalGasEnergyUsed))
-
-
+hvacBuilding.PrintSummary()

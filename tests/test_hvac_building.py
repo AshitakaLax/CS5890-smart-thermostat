@@ -47,3 +47,12 @@ def test_HVAC_on(hvacBuilding: HvacBuilding):
 		currentBuildingTemperature = hvacBuilding.current_temperature
 	
 	assert hvacBuilding.building_hvac.TotalPowerUsed > 0
+
+def test_WattsToDTH(hvacBuilding: HvacBuilding):
+	"""Tests the conversion of watts to DTH
+	
+	Arguments:
+		hvacBuilding {HvacBuilding} -- the hvac Building test fixture object
+	"""
+	
+	assert hvacBuilding.ConvertWattsToDTH(5000000, 3600) == pytest.approx(17.06, 0.01)
