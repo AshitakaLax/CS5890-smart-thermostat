@@ -237,5 +237,52 @@ class HVAC():
 
 
 		
+	def GetElectricKilowattHours(self):
+		"""Gets the number of KWH the HVAC has Used in terms of Electricity
+		"""
+		totalGasEnergyUsed = self.GetTotalGasEnergyUsed()
+		totalEnergy = self.TotalPowerUsed
+		totalElectricEnergyUsed = totalEnergy - totalGasEnergyUsed
+		totalTimeHVACRunning = self.TotalDurationHeatingOn + self.TotalDurationCoolingOn
+		totalTimeHVACRunning = self.TotalTimeInSeconds
+		# convert the total Watts and convert that to KWH
 
+		hoursUsed = totalTimeHVACRunning / 3600
+		# convert the totalElectricEnergyUsed to an average watts per hour
+		averageWatts = totalElectricEnergyUsed / totalTimeHVACRunning
+		kwhUsed = averageWatts * hoursUsed
+		return kwhUsed
+
+
+	def GetGasKilowattHours(self):
+		"""Gets the number of KWH the HVAC has Used in terms of gas equivalent
+		"""
+		totalGasEnergyUsed = self.GetTotalGasEnergyUsed()
+
+
+
+	def GetGasDTH(self):
+		"""Gets the number of DTH the HVAC has Used 
+		"""
+		totalGasEnergyUsed = self.GetTotalGasEnergyUsed()
+		dthUsed = self.ConvertWattsToDTH(totalGasEnergyUsed, self.TotalDurationHeatingOn)
+		return dthUsed
+
+
+	def ConvertWattsToDTH(self, watts, seconds:int):
+		"""Converts the watts and the timespan into Decatherms equivalent
+		
+		Arguments:
+			watts {energy} -- The sumation of watts over the timespan (this is weird, and could be improved)
+			seconds {int} -- The length of time the watts were summed 
+		"""
+		# Convert Watts to Watt hours
+		# determine the number of hours
+		hours = seconds / 3600.0
+		# calculate the average watts for the timeframe given
+		averageWatts = watts / seconds
+		wattHours = averageWatts * hours
+		
+		# convert  Watt hours into DTH
+		return wattHours / 293.001111
 

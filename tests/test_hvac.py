@@ -97,3 +97,31 @@ def test_HVAC_Average_watts(typicalHvac: HVAC):
 
 	assert typicalHvac.GetAverageWattsPerSecond() == ((3740 + 587) / 4)
 
+
+def test_HVAC_Average_watts_per_day(typicalHvac: HVAC):
+	"""Tests the The average watts per second calculation
+	
+	Arguments:
+		typicalHvac {HVAC} -- the hvac test fixture object
+	"""
+	typicalHvac.TurnCoolingOn()
+	for i in range(3600*24):
+		typicalHvac.SimulateOneSecond()
+
+	assert typicalHvac.GetAverageWattsPerSecond() == (3740 + 587)
+	assert typicalHvac.GetAverageWattsPerSecond() * 24 == 103848
+	assert typicalHvac.TotalPowerUsed / 3600 == 103848
+
+def test_HVAC_Average_watts_for_small_time_frame(typicalHvac: HVAC):
+	"""Tests the The average watts per second calculation
+	
+	Arguments:
+		typicalHvac {HVAC} -- the hvac test fixture object
+	"""
+	typicalHvac.TurnCoolingOn()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+	typicalHvac.SimulateOneSecond()
+
+	assert typicalHvac.TotalPowerUsed == (3740 + 587) * 3
+	

@@ -84,7 +84,6 @@ class HvacBuilding():
 		dt_by_cm = self.__time_step_size.total_seconds() / self.__heat_mass_capacity
 		return (self.current_temperature * (1 - dt_by_cm * self.__heat_transmission) + dt_by_cm * (heating_cooling_power + self.__heat_transmission * outside_temperature))
 
-
 	def PrintSummary(self, dollarsPerKiloWattHour = 0.1149, dollarsPerDTH = 6.53535):
 		"""Prints the summary of the Hvac building in the current state
 		"""
@@ -93,40 +92,14 @@ class HvacBuilding():
 		print()
 		print("The Number of times the furnace turns on: " + str(self.building_hvac.NumberOfTimesHeatingTurnedOn))
 		print("The Current Temperature: " + str(self.current_temperature) + "C")
-		print("The total power used: " + str(self.building_hvac.TotalPowerUsed) + "Watts")
-		print("The total power used: " + str(self.building_hvac.TotalPowerUsed / 1000) + "KWatts")
-		print("The total Time furnace is on: " + str(self.building_hvac.TotalTimeInSeconds))
-		wattsPerSecond = self.building_hvac.GetAverageWattsPerSecond()
-		print("The Average Watts Per Second: " + str(wattsPerSecond))
-
-		# convert to Kilowatts per second
-		KilowattHour = wattsPerSecond /1000
-		# convert to kilowatts per hour
-		KilowattHour = KilowattHour * 3600
-		print("The Average KWH: " + str(KilowattHour))
-		totalEnergy = self.building_hvac.TotalPowerUsed
-		totalGasEnergyUsed = self.building_hvac.GetTotalGasEnergyUsed()
-
-		print("The Total Electrical Only Energy Used: " + str(totalEnergy - totalGasEnergyUsed))
-		print("The Total Gas Energy Used: " + str(totalGasEnergyUsed))
+		print("The total Electrical power used: " + str(self.building_hvac.GetElectricKilowattHours()) + "KWH")
+		print("The total Time: " + str(self.building_hvac.TotalTimeInSeconds))
+		print("The total Time Heating was on: " + str(self.building_hvac.TotalDurationHeatingOn))
+		print("The total Time Cooling was on: " + str(self.building_hvac.TotalDurationCoolingOn))
+		print("The Total Gas Energy Used: " + str(self.building_hvac.GetGasDTH()) + " DTH")
 		print("Electrical Cost: $" + str(self.CalculateElectricEneregyCost()))
 		print("Gas Cost: $" + str(self.CalculateGasEneregyCost()))
 
-	def ConvertWattsToDTH(self, watts, seconds:int):
-		"""Converts the watts and the timespan into Decatherms equivalent
-		
-		Arguments:
-			watts {energy} -- The sumation of watts over the timespan
-			seconds {int} -- The length of time the watts were summed
-		"""
-		# Convert Watts to Watt hours
-		# determine the number of hours
-		hours = seconds / 3600.0
-
-		wattHours = watts / hours
-		
-		# convert  Watt hours into DTH
-		return wattHours / 293001.111
 
 	def CalculateGasEneregyCost(self, dollarsPerDTH = 6.53535):
 		"""Calculates the total cost of energy for the gas energy used
@@ -134,8 +107,7 @@ class HvacBuilding():
 		Keyword Arguments:
 			dollarsPerDTH {float} -- calculates the cost per DTH (default: {6.53535})
 		"""
-		totalGasEnergyUsed = self.building_hvac.GetTotalGasEnergyUsed()
-		dthUsed = self.ConvertWattsToDTH(totalGasEnergyUsed, self.building_hvac.TotalDurationHeatingOn)
+		dthUsed = self.building_hvac.GetGasDTH()
 		return dthUsed * dollarsPerDTH
 
 	def CalculateElectricEneregyCost(self, dollarsPerKiloWattHour = 0.1149, ):
@@ -144,17 +116,11 @@ class HvacBuilding():
 		Keyword Arguments:
 			dollarsPerKiloWattHour {float} -- calculates the cost per KWH(default: {0.1149})
 		"""
-		totalGasEnergyUsed = self.building_hvac.GetTotalGasEnergyUsed()
-		totalEnergy = self.building_hvac.TotalPowerUsed
-		totalElectricEnergyUsed = totalEnergy - totalGasEnergyUsed
-		totalTimeHVACRunning = self.building_hvac.TotalDurationHeatingOn + self.building_hvac.TotalDurationCoolingOn
+		electricKWHs = self.building_hvac.GetElectricKilowattHours()
+		
 
-		# convert the total Watts and convert that to KWH
-		hoursUsed = totalTimeHVACRunning / 3600
-		kwhUsed = totalElectricEnergyUsed / hoursUsed
-
-		# convert the 
-		return kwhUsed * dollarsPerKiloWattHour
+		# get the cost per kwh
+		return electricKWHs * dollarsPerKiloWattHour
 
 
 

@@ -43,3 +43,5 @@ for outsideTemperature in loganOutsideTemperatures:
 			hvac.TurnHeatingOn()
 
 hvacBuilding.PrintSummary()
+
+# todo run a loop with various parameters for the set points to determine the optimal temperature in terms of the delta
