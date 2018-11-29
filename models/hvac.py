@@ -135,6 +135,8 @@ class HVAC():
 	def GetAverageWattsPerSecond(self):
 		"""Gets the amount of power that was inputed to actually cooling the house
 		"""
+		if (self.TotalPowerUsed == 0.0 or self.TotalTimeInSeconds == 0):
+			return 0.0
 		return self.TotalPowerUsed / self.TotalTimeInSeconds
 
 	def GetTotalGasEnergyUsed(self):
