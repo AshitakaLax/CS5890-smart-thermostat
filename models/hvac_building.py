@@ -37,11 +37,14 @@ class HvacBuilding():
 		self.__conditioned_floor_area = conditioned_floor_area
 		self.__hvac_building_tracker = hvacBuildingTracker
 
-	def step(self, outside_temperature):
+	def step(self, outside_temperature:float):
 		"""Performs building simulation for the next time step.
 		
 		Parameters:
 			* outside_temperature: [℃]
+
+		Returns:
+			* tuple of the State
 		"""
 
 		def next_temperature(heating_cooling_power):
@@ -76,6 +79,40 @@ class HvacBuilding():
 		# if the hvac_building_tracker exists, then we will add a sample to it.
 		if self.__hvac_building_tracker != None:
 			self.__hvac_building_tracker.AddSample(next_temperature_heating_cooling, outside_temperature, self.building_hvac.GetAverageWattsPerSecond())
+		return (outside_temperature, self.current_temperature, self.building_hvac.GetAverageWattsPerSecond())
+	
+	def get_state(self, outsideTemperature:float):
+		"""Gets the current state of the building
+		"""
+		return (outsideTemperature, self.current_temperature, self.building_hvac.GetAverageWattsPerSecond())
+
+	# todo move this into its own agent that will have the its own Act, reward, step stuff
+	def Act(self, TurnCoolingOn:bool):
+		"""This is the action for the hvac building to execute, and return the reward
+		
+		Arguments:
+			TurnCoolingOn {bool} -- True to turn on the cooling, false to turn off
+		"""
+		# todo we can make this smarter, so that it will require that it will stay within bounds
+		if TurnCoolingOn:
+			self.building_hvac.TurnCoolingOn()
+		else:
+			self.building_hvac.TurnCoolingOff()
+		return self.DetermineReward()
+
+	def DetermineReward(self):
+		# average watts per second
+		# the less the average the better
+		reward =  1-(self.building_hvac.GetAverageWattsPerSecond() / self.building_hvac.GetMaxCoolingPower()) 
+		
+		# currently we are saying that anything that varies from 19.0 C is have less of a reward
+		# divided by 3 to be the diviation tolerance
+		temperatureReward = abs(self.current_temperature - 19.0) / 3.0
+		
+		reward = reward - temperatureReward
+		return reward
+
+
 
 	def GetHvacBuildingTracker(self):
 		return self.__hvac_building_tracker

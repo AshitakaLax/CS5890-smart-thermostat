@@ -125,7 +125,7 @@ class HVAC():
 	def GetMaxCoolingPower(self):
 		"""Get the max amount of cooling available from the A/C
 		"""
-		return self.__air_conditioning_energy
+		return self.__air_conditioning_energy + self.__house_blower_energy
 	
 	def GetLastIntervalCoolingPower(self):
 		"""Gets the amount of power that was inputed to actually cooling the house

@@ -1,12 +1,14 @@
 from models import HVAC
 from models import HvacBuilding
 from util import HvacBuildingTracker
+
 # Create an instance of HVAC to simulate the Furnance
 # use any parameters specific for your furnace
 hvac = HVAC()
 
 # Create the hvac building tracker to keep track of the simulation over time
 tracker = HvacBuildingTracker()
+
 
 # create the building model with the hvac and the tracker
 
@@ -26,6 +28,14 @@ loganOutsideTemperatures = [1.11, 2.22, 1.67, 1.67, 2.22, 1.11, 1.11, 2.78, 4.44
 print()
 print("Starting Hvac Building Example")
 print()
+
+# items I need to get for the state
+# current Temp  float
+# outside temp  float
+# average power/second  float
+
+
+
 
 # simulate one day
 numberOfHeatingOn = 0
