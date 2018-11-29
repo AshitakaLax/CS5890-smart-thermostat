@@ -68,7 +68,7 @@ class HvacBuilding():
 			btu_power = self.building_hvac.GetLastIntervalHeatingPower()
 
 		elif self.building_hvac.CoolingIsOn:
-			btu_power = self.building_hvac.GetLastIntervalCoolingPower()
+			btu_power = -1.0 *self.building_hvac.GetLastIntervalCoolingPower()
 		
 		next_temperature_heating_cooling = next_temperature(btu_power)
 		self.current_temperature = next_temperature_heating_cooling
@@ -91,6 +91,7 @@ class HvacBuilding():
 		print("     RESULTS    ")
 		print()
 		print("The Number of times the furnace turns on: " + str(self.building_hvac.NumberOfTimesHeatingTurnedOn))
+		print("The Number of times the AC turns on: " + str(self.building_hvac.NumberOfTimesCoolingTurnedOn))
 		print("The Current Temperature: " + str(self.current_temperature) + "C")
 		print("The total Electrical power used: " + str(self.building_hvac.GetElectricKilowattHours()) + "KWH")
 		print("The total Time: " + str(self.building_hvac.TotalTimeInSeconds))
