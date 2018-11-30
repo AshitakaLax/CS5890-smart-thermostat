@@ -64,6 +64,29 @@ class HVAC():
 		self.__lastHeatingEnergyInputed = 0 # Used to keep track of the last amount of just heating energy that was inputed into the house (this is 0 during heating start up)
 
 		
+	def reset(self):
+		# reset all of the variables to the initial state
+		self.TotalPowerUsed = 0.0 # The total number of watts used
+		self.TotalTimeInSeconds = 0 # The total amount of time the furnace has run for
+		self.TotalPowerHeatingUsed = 0.0 # The Total amount of Power Heating has been used (includes gas heating energy and overhead energy)
+		self.TotalPowerCoolingUsed = 0.0 # The Total amount of Power Cooling has been used (includes cooling energy and overhead energy)
+		self.TotalDurationHeatingOn = 0.0 # The total amount of time the heating has been used (including starting and shutdown usage)
+		self.TotalDurationCoolingOn = 0.0 # The total amount of time the cooling has been used
+		self.CoolingIsOn = False # whether the Cooling is on or off
+		self.HeatingIsShuttingDown = False # whether the Heating is in the shutting down phase
+		self.HeatingIsOn = False # Whether the Heater is on or off (This is true when the heating is shutting down)
+		self.LastCoolingDuration = 0 # The last length of time of the last cooling duration
+		self.LastHeatingDuration = 0 # the last length of time of the last heating duration (this includes the starting and shutdown usage)
+		self.TotalGasEnergyUsed = 0.0 # The total amount of gas energy
+		self.NumberOfTimesHeatingTurnedOn = 0
+		self.NumberOfTimesCoolingTurnedOn = 0
+
+		# initialize Private Variables
+		self.__HeatingShutoffDuration = 0 # Used to keep track of how long we have been shutting down the heater
+		self.__lastCoolingEnergyInputed = 0 # Used to keep track of the last amount of just cooling energy that was inputed into the house
+		self.__lastHeatingEnergyInputed = 0 # Used to keep track of the last amount of just heating energy that was inputed into the house (this is 0 during heating start up)
+
+
 	def TurnCoolingOn(self):
 		"""Turns the A/C on.
 		"""

@@ -36,6 +36,7 @@ class HvacBuilding():
 		self.__time_step_size = timedelta(seconds=1)
 		self.__conditioned_floor_area = conditioned_floor_area
 		self.__hvac_building_tracker = hvacBuildingTracker
+		self.__last_outside_temperature = 0.0
 
 	def step(self, outside_temperature:float):
 		"""Performs building simulation for the next time step.
@@ -63,6 +64,7 @@ class HvacBuilding():
 			)
 
 		# Simulate the one second with the hvac to get the values that will be used
+		self.__last_outside_temperature = outside_temperature
 		self.building_hvac.SimulateOneSecond()
 
 		# check whether the heater of Cooling is on
@@ -113,6 +115,9 @@ class HvacBuilding():
 		return reward
 
 
+	def reset(self):
+		self.current_temperature = 18
+		self.building_hvac.reset()
 
 	def GetHvacBuildingTracker(self):
 		return self.__hvac_building_tracker

@@ -23,7 +23,33 @@ hvacBuilding = HvacBuilding(
 )
 
 # a set of temperatures in Northern Utah, USA for one day
-loganOutsideTemperatures = [1.11, 2.22, 1.67, 1.67, 2.22, 1.11, 1.11, 2.78, 4.44, 4.44, 5.56, 6.67, 6.67, 7.22, 6.67, 2.22, 2.22, 1.67, 1.11, 1.11, 0.56, 1.11, 0.00, 0.00]
+loganOutsideTemperatures_October = [1.11, 2.22, 1.67, 1.67, 2.22, 1.11, 1.11, 2.78, 4.44, 4.44, 5.56, 6.67, 6.67, 7.22, 6.67, 2.22, 2.22, 1.67, 1.11, 1.11, 0.56, 1.11, 0.00, 0.00]
+loganOutsideTemperatures =[
+-7
+,-8
+,-8
+,-8
+,-8
+,-9
+,-10
+,-9
+,-8
+,-7
+,-4
+,-2
+,-3
+,-2
+,-2
+,-1
+,-2
+,-3
+,-3
+,-4
+,-4
+,-4
+,-4
+,-4
+]
 
 print()
 print("Starting Hvac Building Example")
